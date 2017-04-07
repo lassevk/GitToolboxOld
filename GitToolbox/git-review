@@ -1,0 +1,47 @@
+#!/bin/sh
+
+UPSTREAM=${1:-'@{u}'}
+LOCAL=$(git rev-parse @)
+REMOTE=$(git rev-parse "$UPSTREAM")
+BASE=$(git merge-base @ "$UPSTREAM")
+
+LOCAL_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+REMOTE_BRANCH=$(git rev-parse --abbrev-ref @{upstream})
+
+if [ $LOCAL = $REMOTE ]; then
+    echo "$LOCAL_BRANCH is up-to-date with $REMOTE_BRANCH, nothing to review"
+	exit 0
+fi
+
+set -- $(git rev-list --left-right --count $LOCAL_BRANCH...$REMOTE_BRANCH)
+behind=$2
+ahead=$1
+
+if [ $LOCAL = $BASE ]; then
+    if [[ $behind -eq 1 ]]; then 
+        echo "$LOCAL_BRANCH is $behind commit behind $REMOTE_BRANCH, pull will fast-forward, reviewing incoming changes"
+    else
+        echo "$LOCAL_BRANCH is $behind commits behind $REMOTE_BRANCH, pull will fast-forward, reviewing incoming changes"
+    fi
+    git difftool -d $REMOTE_BRANCH $LOCAL_BRANCH
+elif [ $REMOTE = $BASE ]; then
+    if [[ $ahead -eq 1 ]]; then
+        echo "$LOCAL_BRANCH is 1 commit ahead of $REMOTE_BRANCH, reviewing outgoing changes"
+    else
+        echo "$LOCAL_BRANCH is $ahead commits ahead of $REMOTE_BRANCH, reviewing outgoing changes"
+    fi
+    git difftool -d $REMOTE_BRANCH $LOCAL_BRANCH
+else
+    if [[ $ahead -eq 1 ]]; then
+        if [[ $behind -eq 1 ]]; then
+            echo "$LOCAL_BRANCH is $ahead commit ahead of and $behind commit behind $REMOTE_BRANCH, a merge is required, reviewing differences"
+        else
+            echo "$LOCAL_BRANCH is $ahead commits ahead of and $behind commit behind $REMOTE_BRANCH, a merge is required, reviewing differences"
+        fi
+    elif [[ $behind -eq 1 ]]; then
+        echo "$LOCAL_BRANCH is $ahead commits ahead of and $behind commit behind $REMOTE_BRANCH, a merge is required, reviewing differences"
+    else
+        echo "$LOCAL_BRANCH is $ahead commits ahead of and $behind commits behind $REMOTE_BRANCH, a merge is required, reviewing differences"
+    fi
+    git difftool -d $REMOTE_BRANCH $LOCAL_BRANCH
+fi

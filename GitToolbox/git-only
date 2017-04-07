@@ -1,0 +1,6 @@
+#!/bin/sh
+
+ARGS=$(git toolbox only-on-branch $1)
+if [ $? -eq 0 ]; then
+	eval git lg $ARGS
+fi

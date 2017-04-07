@@ -1,0 +1,3 @@
+#!/bin/sh
+
+git lg --branches --not --remotes

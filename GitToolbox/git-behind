@@ -1,0 +1,3 @@
+#!/bin/sh
+
+git lg `git rev-parse --abbrev-ref HEAD`..`git rev-parse --abbrev-ref \`git rev-parse --abbrev-ref HEAD\`@{upstream}`
