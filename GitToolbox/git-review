@@ -17,31 +17,21 @@ set -- $(git rev-list --left-right --count $LOCAL_BRANCH...$REMOTE_BRANCH)
 behind=$2
 ahead=$1
 
-if [ $LOCAL = $BASE ]; then
-    if [[ $behind -eq 1 ]]; then 
-        echo "$LOCAL_BRANCH is $behind commit behind $REMOTE_BRANCH, pull will fast-forward, reviewing incoming changes"
-    else
-        echo "$LOCAL_BRANCH is $behind commits behind $REMOTE_BRANCH, pull will fast-forward, reviewing incoming changes"
-    fi
-    git difftool -d $REMOTE_BRANCH $LOCAL_BRANCH
-elif [ $REMOTE = $BASE ]; then
-    if [[ $ahead -eq 1 ]]; then
-        echo "$LOCAL_BRANCH is 1 commit ahead of $REMOTE_BRANCH, reviewing outgoing changes"
-    else
-        echo "$LOCAL_BRANCH is $ahead commits ahead of $REMOTE_BRANCH, reviewing outgoing changes"
-    fi
-    git difftool -d $REMOTE_BRANCH $LOCAL_BRANCH
-else
-    if [[ $ahead -eq 1 ]]; then
-        if [[ $behind -eq 1 ]]; then
-            echo "$LOCAL_BRANCH is $ahead commit ahead of and $behind commit behind $REMOTE_BRANCH, a merge is required, reviewing differences"
-        else
-            echo "$LOCAL_BRANCH is $ahead commits ahead of and $behind commit behind $REMOTE_BRANCH, a merge is required, reviewing differences"
-        fi
-    elif [[ $behind -eq 1 ]]; then
-        echo "$LOCAL_BRANCH is $ahead commits ahead of and $behind commit behind $REMOTE_BRANCH, a merge is required, reviewing differences"
-    else
-        echo "$LOCAL_BRANCH is $ahead commits ahead of and $behind commits behind $REMOTE_BRANCH, a merge is required, reviewing differences"
-    fi
-    git difftool -d $REMOTE_BRANCH $LOCAL_BRANCH
+behind_ending=
+if [[ $behind -ne 1 ]]; then
+	behind_ending=s
 fi
+ahead_ending=
+if [[ $ahead -ne 1 ]]; then
+	ahead_ending=s
+fi
+
+if [ $LOCAL = $BASE ]; then
+    echo "$LOCAL_BRANCH is $behind commit$behind_ending behind $REMOTE_BRANCH, pull will fast-forward, reviewing incoming changes"
+elif [ $REMOTE = $BASE ]; then
+    echo "$LOCAL_BRANCH is $ahead commit$ahead_ending ahead of $REMOTE_BRANCH, reviewing outgoing changes"
+else
+    echo "$LOCAL_BRANCH is $ahead commit$ahead_ending ahead of and $behind commit$behind_ending behind $REMOTE_BRANCH, a merge is required, reviewing differences"
+fi
+
+git difftool -d $REMOTE_BRANCH $LOCAL_BRANCH

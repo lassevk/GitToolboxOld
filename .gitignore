@@ -24,6 +24,9 @@ bld/
 [Oo]bj/
 [Ll]og/
 
+# ReSharper settings files
+*.DotSettings
+
 # FinalBuilder files
 *.fbl8
 *.fb8lck
