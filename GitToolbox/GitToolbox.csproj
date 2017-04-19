@@ -73,6 +73,9 @@
     <Content Include="git-unpushed">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <None Include="git-bs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="git-dirdiff">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

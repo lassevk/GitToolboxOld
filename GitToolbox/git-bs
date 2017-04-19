@@ -1,0 +1,25 @@
+#!/bin/sh
+
+BRANCHES=$(git branch | cut -c 3-)
+for BRANCH in $(git branch | cut -c 3-); do
+    UPSTREAM=`git rev-parse --abbrev-ref $BRANCH@{u} --quiet 2>/dev/null`
+    if [ "$UPSTREAM" != "" ]; then
+        set -- $(git rev-list --left-right --count $BRANCH...$UPSTREAM)
+        AHEAD=$1
+        BEHIND=$2
+        
+        if [ $AHEAD -eq 0 ]; then
+            if [ $BEHIND -eq 0 ]; then
+                echo $BRANCH
+            else
+                echo "$BRANCH is $BEHIND behind (can fast-forward)"
+            fi
+        else
+            if [ $BEHIND -eq 0 ]; then
+                echo $BRANCH is $AHEAD ahead.
+            else
+                echo $BRANCH is $AHEAD ahead and $BEHIND behind.
+            fi
+        fi
+    fi
+done
